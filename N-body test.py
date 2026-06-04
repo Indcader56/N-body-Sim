@@ -164,11 +164,11 @@ while True:
                 # Checks if a collision between bodies has happened and if so, the smaller one gets consumed by the bigger one
                 if body.check_collision(other_body.x_pos, other_body.y_pos, other_body.mass) == True:
                     if other_body.mass > body.mass:
-                        winner = other_body.mass
-                        loser = body.mass                 
+                        winner = other_body
+                        loser = body         
                     else:
-                        winner = body.mass
-                        loser = other_body.mass
+                        winner = body
+                        loser = other_body
 
                     winner_loser_momentum_and_mass(winner, loser)
                         

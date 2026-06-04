@@ -160,6 +160,7 @@ while True:
                 # Checks if a collision between bodies has happened and if so, the smaller one gets consumed by the bigger one
                 if body.check_collision(other_bodies.x_pos,other_bodies.y_pos,other_bodies.mass) == True:
                     if other_bodies.mass > body.mass:
+
                         other_bodies.speed_x = ((other_bodies.mass * other_bodies.speed_x) + (body.mass * body.speed_x)) / (body.mass + other_bodies.mass)
                         other_bodies.speed_y = ((other_bodies.mass * other_bodies.speed_y) + (body.mass * body.speed_y)) / (body.mass + other_bodies.mass)
 
@@ -167,6 +168,7 @@ while True:
 
                         bodies.pop(bodies.index(body))
                     else:
+                        
                         body.speed_x = ((body.mass * body.speed_x) + (other_bodies.mass * other_bodies.speed_x)) / (body.mass + other_bodies.mass)
                         body.speed_y = ((body.mass * body.speed_y) + (other_bodies.mass * other_bodies.speed_y)) / (body.mass + other_bodies.mass)
 
@@ -180,7 +182,7 @@ while True:
     for body in bodies:
         body.update_pos()
         body.display()
-    
+    print("chicken")
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if hold == 1:
         pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)

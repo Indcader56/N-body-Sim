@@ -151,28 +151,28 @@ while True:
     deleted_bodies = []
     # Updates the speed of a given body by looping through every other body and updating its speed
     for body in bodies:
-        for other_bodies in bodies:
-            if not body == other_bodies:
+        for other_body in bodies:
+            if not body == other_body:
                 # Checks if a collision between bodies has happened and if so, the smaller one gets consumed by the bigger one
-                if body.check_collision(other_bodies.x_pos,other_bodies.y_pos,other_bodies.mass) == True:
-                    if other_bodies.mass > body.mass:
+                if body.check_collision(other_body.x_pos,other_body.y_pos,other_body.mass) == True:
+                    if other_body.mass > body.mass:
 
-                        other_bodies.speed_x = ((other_bodies.mass * other_bodies.speed_x) + (body.mass * body.speed_x)) / (body.mass + other_bodies.mass)
-                        other_bodies.speed_y = ((other_bodies.mass * other_bodies.speed_y) + (body.mass * body.speed_y)) / (body.mass + other_bodies.mass)
+                        other_body.speed_x = ((other_body.mass * other_body.speed_x) + (body.mass * body.speed_x)) / (body.mass + other_body.mass)
+                        other_body.speed_y = ((other_body.mass * other_body.speed_y) + (body.mass * body.speed_y)) / (body.mass + other_body.mass)
 
-                        other_bodies.mass += body.mass
+                        other_body.mass += body.mass
                         
                         deleted_bodies.append(body)
                     else:
                         
-                        body.speed_x = ((body.mass * body.speed_x) + (other_bodies.mass * other_bodies.speed_x)) / (body.mass + other_bodies.mass)
-                        body.speed_y = ((body.mass * body.speed_y) + (other_bodies.mass * other_bodies.speed_y)) / (body.mass + other_bodies.mass)
+                        body.speed_x = ((body.mass * body.speed_x) + (other_body.mass * other_body.speed_x)) / (body.mass + other_body.mass)
+                        body.speed_y = ((body.mass * body.speed_y) + (other_body.mass * other_body.speed_y)) / (body.mass + other_body.mass)
 
-                        body.mass += other_bodies.mass
+                        body.mass += other_body.mass
 
-                        deleted_bodies.append(other_bodies)
+                        deleted_bodies.append(other_body)
                 
-                body.update_speed(other_bodies.x_pos,other_bodies.y_pos,other_bodies.mass)
+                body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
 
     # Checks if a body is outside the screen and removes it from the list if it is outside
     for body in bodies:

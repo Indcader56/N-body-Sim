@@ -17,6 +17,14 @@ pygame.display.set_caption("N-body sim")
 planet_color = (255,255,255)
 line_color = (245,245,245)
 
+def winner_loser_momentum_and_mass(winner, loser):
+    winner.speed_x = ((winner.mass * winner.speed_x) + (loser.mass * loser.speed_x)) / (winner.mass + loser.mass)
+    winner.speed_y = ((winner.mass * winner.speed_y) + (loser.mass * loser.speed_y)) / (winner.mass + loser.mass)
+
+    winner.mass += loser.mass
+
+    deleted_bodies.append(loser)
+
 def find_distance(other_x, other_y, self_x, self_y):
     return math.sqrt(((other_x-self_x)**2) + ((other_y-self_y)**2))
 
@@ -154,24 +162,16 @@ while True:
         for other_body in bodies:
             if not body == other_body:
                 # Checks if a collision between bodies has happened and if so, the smaller one gets consumed by the bigger one
-                if body.check_collision(other_body.x_pos,other_body.y_pos,other_body.mass) == True:
+                if body.check_collision(other_body.x_pos, other_body.y_pos, other_body.mass) == True:
                     if other_body.mass > body.mass:
-
-                        other_body.speed_x = ((other_body.mass * other_body.speed_x) + (body.mass * body.speed_x)) / (body.mass + other_body.mass)
-                        other_body.speed_y = ((other_body.mass * other_body.speed_y) + (body.mass * body.speed_y)) / (body.mass + other_body.mass)
-
-                        other_body.mass += body.mass
-                        
-                        deleted_bodies.append(body)
+                        winner = other_body.mass
+                        loser = body.mass                 
                     else:
+                        winner = body.mass
+                        loser = other_body.mass
+
+                    winner_loser_momentum_and_mass(winner, loser)
                         
-                        body.speed_x = ((body.mass * body.speed_x) + (other_body.mass * other_body.speed_x)) / (body.mass + other_body.mass)
-                        body.speed_y = ((body.mass * body.speed_y) + (other_body.mass * other_body.speed_y)) / (body.mass + other_body.mass)
-
-                        body.mass += other_body.mass
-
-                        deleted_bodies.append(other_body)
-                
                 body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
 
     # Checks if a body is outside the screen and removes it from the list if it is outside

@@ -148,11 +148,7 @@ while True:
     # Clears the screen
     screen.fill((0,0,0))
 
-    # Checks if a body is outside the screen and removes it from the list if it is outside
-    for body in bodies:
-        if body.x_pos < 0-(body.mass) or body.x_pos > window_size_x+(body.mass) or body.y_pos < 0-(body.mass) or body.y_pos > window_size_y+(body.mass):
-            bodies.pop(bodies.index(body))
-
+    deleted_bodies = []
     # Updates the speed of a given body by looping through every other body and updating its speed
     for body in bodies:
         for other_bodies in bodies:
@@ -165,8 +161,8 @@ while True:
                         other_bodies.speed_y = ((other_bodies.mass * other_bodies.speed_y) + (body.mass * body.speed_y)) / (body.mass + other_bodies.mass)
 
                         other_bodies.mass += body.mass
-
-                        bodies.pop(bodies.index(body))
+                        
+                        deleted_bodies.append(body)
                     else:
                         
                         body.speed_x = ((body.mass * body.speed_x) + (other_bodies.mass * other_bodies.speed_x)) / (body.mass + other_bodies.mass)
@@ -174,9 +170,15 @@ while True:
 
                         body.mass += other_bodies.mass
 
-                        bodies.pop(bodies.index(other_bodies))
+                        deleted_bodies.append(other_bodies)
                 
                 body.update_speed(other_bodies.x_pos,other_bodies.y_pos,other_bodies.mass)
+
+    # Checks if a body is outside the screen and removes it from the list if it is outside
+    for body in bodies:
+        if body.x_pos < 0-(body.mass) or body.x_pos > window_size_x+(body.mass) or body.y_pos < 0-(body.mass) or body.y_pos > window_size_y+(body.mass) or body in deleted_bodies:
+            bodies.pop(bodies.index(body))
+
     
     # Updates the position of the bodies and draws them to the screen
     for body in bodies:

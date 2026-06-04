@@ -182,7 +182,7 @@ while True:
     for body in bodies:
         body.update_pos()
         body.display()
-    print("chicken")
+
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if hold == 1:
         pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)

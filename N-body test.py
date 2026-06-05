@@ -17,6 +17,7 @@ pygame.display.set_caption("N-body sim")
 planet_color = (255,255,255)
 line_color = (245,245,245)
 
+# Figures out the resulting speed and mass of the bigger body (winner) and adds the "losing" body to a list to be deleted
 def winner_loser_momentum_and_mass(winner, loser):
     winner.speed_x = ((winner.mass * winner.speed_x) + (loser.mass * loser.speed_x)) / (winner.mass + loser.mass)
     winner.speed_y = ((winner.mass * winner.speed_y) + (loser.mass * loser.speed_y)) / (winner.mass + loser.mass)
@@ -25,8 +26,16 @@ def winner_loser_momentum_and_mass(winner, loser):
 
     deleted_bodies.append(loser)
 
+# Finds the distance between two points
 def find_distance(other_x, other_y, self_x, self_y):
     return math.sqrt(((other_x-self_x)**2) + ((other_y-self_y)**2))
+
+# Finds the x and y componets of a vector
+def final_x_y_componets(magnitude, angle):
+    magnitude_x = math.cos(angle) * magnitude
+    magnitude_y = math.sin(angle) * magnitude
+
+    return magnitude_x, magnitude_y
 
 def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass):
     # Finds the distance between the other body and the current body
@@ -46,8 +55,7 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
     angle = math.atan2(y_side, x_side)
 
     # Uses the force length and the angle to find the componets of the force (fx,fy)
-    force_x = math.cos(angle) * force
-    force_y = math.sin(angle) * force
+    force_x, force_y = final_x_y_componets(force, angle)
 
     return force_x, force_y
 
@@ -135,8 +143,7 @@ while True:
                 angle = math.atan2(y_side, x_side)
 
                 # Finds the start force x and y and uses it to make the new object
-                start_force_x = math.cos(angle) * distance
-                start_force_y = math.sin(angle) * distance
+                start_force_x, start_force_y = final_x_y_componets(distance, angle)
 
                 bodies.append(Body(past_mouse_x,past_mouse_y,start_force_x,start_force_y,select_mass))
 

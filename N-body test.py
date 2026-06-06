@@ -37,6 +37,7 @@ def final_x_y_componets(magnitude, angle):
 
     return magnitude_x, magnitude_y
 
+# Finds force componets for gravity
 def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass):
     # Finds the distance between the other body and the current body
     distance = find_distance(other_x, other_y, self_x, self_y)
@@ -58,6 +59,22 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
     force_x, force_y = final_x_y_componets(force, angle)
 
     return force_x, force_y
+
+def find_distance_componets():
+    # Finds the distance between the past mouse pos and the current mouse pos
+    distance = find_distance(mouse_x, mouse_y, past_mouse_x, past_mouse_y)/50
+
+    # Finds the difference in x and y to find the angle
+    x_side = past_mouse_x - mouse_x
+    y_side = past_mouse_y - mouse_y
+
+    angle = math.atan2(y_side, x_side)
+
+    # Finds the start force x and y and uses it to make the new object
+    start_force_x, start_force_y = final_x_y_componets(distance, angle)
+
+    return start_force_x, start_force_y
+
 
 # Body class
 class Body:
@@ -133,18 +150,9 @@ while True:
         # Computates the speed x and y of the body when it is created based on the mouse pos
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                # Finds the distance between the past mouse pos and the current mouse pos
-                distance = find_distance(mouse_x, mouse_y, past_mouse_x, past_mouse_y)/50
-
-                # Finds the difference in x and y to find the angle
-                x_side = past_mouse_x - mouse_x
-                y_side = past_mouse_y - mouse_y
-
-                angle = math.atan2(y_side, x_side)
-
-                # Finds the start force x and y and uses it to make the new object
-                start_force_x, start_force_y = final_x_y_componets(distance, angle)
-
+                
+                start_force_x, start_force_y = find_distance_componets()
+                
                 bodies.append(Body(past_mouse_x,past_mouse_y,start_force_x,start_force_y,select_mass))
 
                 hold = 0

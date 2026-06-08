@@ -6,4 +6,4 @@ Right now the game
  * Allows users to shoot the bodies by dragging
  * Calculates gravitation attraction and momentum from collisions
 
-I plan to soon support body rotation, graphics with the bodies, and maybe even a small rocket the player can spawn to fly around.
+Right now its a good gravity sim so I probably will let it be :D

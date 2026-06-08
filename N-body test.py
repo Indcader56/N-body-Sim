@@ -6,6 +6,7 @@ import math
 
 # Initalizing stuff
 pygame.init()
+pygame.font.init()
 
 window_size_x = 960
 window_size_y = 720
@@ -14,8 +15,13 @@ window_size = (window_size_x,window_size_y)
 screen = pygame.display.set_mode(window_size)
 pygame.display.set_caption("N-body sim")
 
-planet_color = (255,255,255)
+# Colors used for assents
+planet_color = (200,200,200)
 line_color = (245,245,245)
+text_color = (255,255,255)
+
+# Font for text
+text_font = pygame.font.Font(None, 50)
 
 # Figures out the resulting speed and mass of the bigger body (winner) and adds the "losing" body to a list to be deleted
 def winner_loser_momentum_and_mass(winner, loser):
@@ -60,13 +66,20 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
 
     return force_x, force_y
 
-def find_distance_componets():
+def find_distance_componets(past_x, past_y, current_x, current_y):
     # Finds the distance between the past mouse pos and the current mouse pos
-    distance = find_distance(mouse_x, mouse_y, past_mouse_x, past_mouse_y)/50
+    distance = find_distance(past_x, past_y, current_x, current_y)
+
+    if distance >= select_mass:
+        distance -= select_mass
+    else:
+        return 0,0
+
+    distance = distance/50
 
     # Finds the difference in x and y to find the angle
-    x_side = past_mouse_x - mouse_x
-    y_side = past_mouse_y - mouse_y
+    x_side = past_x - current_x
+    y_side = past_y - current_y
 
     angle = math.atan2(y_side, x_side)
 
@@ -151,7 +164,7 @@ while True:
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 
-                start_force_x, start_force_y = find_distance_componets()
+                start_force_x, start_force_y = find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y)
                 
                 bodies.append(Body(past_mouse_x,past_mouse_y,start_force_x,start_force_y,select_mass))
 
@@ -171,6 +184,7 @@ while True:
     # Clears the screen
     screen.fill((0,0,0))
 
+
     deleted_bodies = []
     # Updates the speed of a given body by looping through every other body and updating its speed
     for body in bodies:
@@ -180,12 +194,15 @@ while True:
                 if body.check_collision(other_body.x_pos, other_body.y_pos, other_body.mass) == True:
                     if other_body.mass > body.mass:
                         winner = other_body
-                        loser = body         
+                        loser = body
                     else:
                         winner = body
                         loser = other_body
-
-                    winner_loser_momentum_and_mass(winner, loser)
+                    
+                    # Checks if the winner/loser is in the deleted list so that the function doesn't run twice
+                    if not winner in deleted_bodies:
+                        if not loser in deleted_bodies:
+                            winner_loser_momentum_and_mass(winner, loser)
                         
                 body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
 
@@ -202,10 +219,15 @@ while True:
 
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if hold == 1:
+        pygame.draw.line(screen, line_color, (past_mouse_x,past_mouse_y), (mouse_x, mouse_y), 1)
         pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)
-        pygame.draw.line(screen, line_color, (past_mouse_x,past_mouse_y), (mouse_x, mouse_y), 5)
     else:
         pygame.draw.circle(screen, planet_color, (mouse_x,mouse_y), select_mass)
+
+    # Draws the select_mass variable in the corner and blits it
+    text_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
+
+    screen.blit(text_surface, (0,0))
 
     pygame.display.flip()
 

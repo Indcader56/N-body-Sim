@@ -108,12 +108,22 @@ class Body:
         self.speed_x += force_componets[0]
         self.speed_y += force_componets[1]
     
-    # Takes the distance between two bodies and checks if they have collided
+    
     def check_collision(self, other_x, other_y, other_mass):
+        # Takes the distance between two bodies and checks if they have collided
         distance = math.sqrt(((other_x-self.x_pos)**2) + ((other_y-self.y_pos)**2))
 
-        if distance <= other_mass + self.mass:
-            return True
+        # Determines the winner of the collision
+        if other_mass > self.mass:
+            winner = other_body
+            loser = body
+        else:
+            winner = body
+            loser = other_body
+
+        # Checks if the collision actually happened and returns based on that
+        if distance <= winner.mass + loser.mass/2:
+            return winner, loser
         else:
             return False
 
@@ -191,13 +201,9 @@ while True:
         for other_body in bodies:
             if not body == other_body:
                 # Checks if a collision between bodies has happened and if so, the smaller one gets consumed by the bigger one
-                if body.check_collision(other_body.x_pos, other_body.y_pos, other_body.mass) == True:
-                    if other_body.mass > body.mass:
-                        winner = other_body
-                        loser = body
-                    else:
-                        winner = body
-                        loser = other_body
+                collided = body.check_collision(other_body.x_pos, other_body.y_pos, other_body.mass)
+                if collided != False:
+                    winner, loser = collided
                     
                     # Checks if the winner/loser is in the deleted list so that the function doesn't run twice
                     if not winner in deleted_bodies:

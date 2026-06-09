@@ -186,6 +186,9 @@ while True:
                 select_mass += 1
             if event.y < 0:
                 select_mass -= 1
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                bodies = [Body(random.randint(0,window_size_x), random.randint(0,window_size_y), random.randint(-5.0, 5.0), random.randint(-5.0, 5.0), random.randint(1, 10)) for i in range(100)]
 
     # Makes sure the select_mass variable never goes below 0
     if select_mass < 1:

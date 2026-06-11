@@ -148,7 +148,7 @@ class Body:
 
     def check_hover(self):
         if mouse_x > self.x_pos - (self.mass) and mouse_x < self.x_pos + (self.mass) and mouse_y > self.y_pos - (self.mass) and mouse_y < self.y_pos + (self.mass):
-            pygame.draw.rect(screen, (255,0,0), (self.x_pos-self.mass, self.y_pos-self.mass, self.mass*2,self.mass*2), 5)
+            pygame.draw.rect(screen, (255,0,0), (self.x_pos-self.mass, self.y_pos-self.mass, self.mass*2,self.mass*2), 1)
             
         return False
 
@@ -279,7 +279,7 @@ while True:
                         
                 body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
     
-    if mode_key == 3:
+    if mode_key == 3 and not True in hovering_list:
         for body in bodies:
             if body.check_click() == True:
                 deleted_bodies.append(body)

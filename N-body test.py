@@ -16,9 +16,9 @@ screen = pygame.display.set_mode(window_size)
 pygame.display.set_caption("N-body sim")
 
 # Colors used for assents
-planet_color = (200,200,200)
-line_color = (245,245,245)
-text_color = (255,255,255)
+planet_color = (255,255,255)
+line_color = (205,205,205)
+text_color = (250,250,250)
 red = (255,0,0)
 
 # Font for text
@@ -316,6 +316,7 @@ while True:
         if mode_key == 3:
             body.check_hover()
 
+
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if mode_key == 2 and not True in hovering_list:
         if hold == 1:
@@ -323,7 +324,7 @@ while True:
             pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)
         else:
             pygame.draw.circle(screen, planet_color, (mouse_x,mouse_y), select_mass)
-
+    
     # Draws the select_mass variable in the corner and blits it
     text_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
 

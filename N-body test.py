@@ -19,6 +19,7 @@ pygame.display.set_caption("N-body sim")
 planet_color = (200,200,200)
 line_color = (245,245,245)
 text_color = (255,255,255)
+red = (255,0,0)
 
 # Font for text
 text_font = pygame.font.Font(None, 50)
@@ -73,6 +74,7 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
 
     return force_x, force_y
 
+# Finds the distance between two points: used for finding the starting speed of a body when placed
 def find_distance_componets(past_x, past_y, current_x, current_y):
     # Finds the distance between the past mouse pos and the current mouse pos
     distance = find_distance(past_x, past_y, current_x, current_y)
@@ -115,7 +117,7 @@ class Body:
         self.speed_x += force_componets[0]
         self.speed_y += force_componets[1]
     
-    
+    # Checks if a collision happens between two bodies
     def check_collision(self, other_x, other_y, other_mass):
         # Takes the distance between two bodies and checks if they have collided
         distance = math.sqrt(((other_x-self.x_pos)**2) + ((other_y-self.y_pos)**2))
@@ -138,7 +140,8 @@ class Body:
     def update_pos(self):
         self.x_pos += self.speed_x
         self.y_pos += self.speed_y
-    
+
+    # Checks if a body is clicked and returns accordingly
     def check_click(self):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if mouse_x > self.x_pos - (self.mass) and mouse_x < self.x_pos + (self.mass) and mouse_y > self.y_pos - (self.mass) and mouse_y < self.y_pos + (self.mass):
@@ -146,9 +149,10 @@ class Body:
             
         return False
 
+    # Checks if the mouse is over the body. If True and mode_key is 3, then it draws a rectangle over the body
     def check_hover(self):
         if mouse_x > self.x_pos - (self.mass) and mouse_x < self.x_pos + (self.mass) and mouse_y > self.y_pos - (self.mass) and mouse_y < self.y_pos + (self.mass):
-            pygame.draw.rect(screen, (255,0,0), (self.x_pos-self.mass, self.y_pos-self.mass, self.mass*2,self.mass*2), 1)
+            pygame.draw.rect(screen, red, (self.x_pos-self.mass, self.y_pos-self.mass, self.mass*2,self.mass*2), 1)
             
         return False
 
@@ -156,15 +160,18 @@ class Body:
     def display(self):
         pygame.draw.circle(screen, planet_color, (self.x_pos,self.y_pos), self.mass)
 
+# The class Button which makes allows buttons to be made
 class Button():
     def __init__(self, x,y, image):
         self.x = x
         self.y = y
         self.image = image
 
+    # Draws the button on the screen
     def draw_button(self):
         screen.blit(self.image, (self.x, self.y))
 
+    # If a click happens, it returns a number to be used to change the mode_key variable. Otherwise it returns false
     def check_click(self):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if mouse_x > self.x and mouse_x < self.x + 55 and mouse_y > self.y and mouse_y < self.y + 55:
@@ -177,13 +184,14 @@ class Button():
             
         return False
     
+    # Checks if the mouse is on the button
     def check_hover(self):
         if mouse_x > self.x and mouse_x < self.x + 55 and mouse_y > self.y and mouse_y < self.y + 55:
             return True
         
         return False
 
-
+# The buttons list hosts the button objects
 buttons = [Button(window_size_x-165, 0, button_one), Button(window_size_x-110, 0, button_two), Button(window_size_x-55, 0, button_three)]
 
 # The list where the body objects are held
@@ -200,6 +208,14 @@ hold = 0
 past_mouse_x = 0
 past_mouse_y = 0
 
+"""
+The mode key variable determines what the user can do 
+
+1 - Nothing, everything is disabled so that the user can watch
+2 - Allows the user to add bodies and shoot them
+3 - When a user clicks on a body in this mode, it deletes it
+
+"""
 mode_key = 1
 
 # Main Game Loop
@@ -209,10 +225,10 @@ while True:
     mouse_x = mouse[0]
     mouse_y = mouse[1]
 
-
     # Checks for user input
     for event in pygame.event.get():
-
+        
+        # Goes through the button list and checks if the mouse is hovering over the buttons and checks if a click happens. If it does, it updates the mode_key variable
         hovering_list = []
         for button in buttons:
             button_click = button.check_click()
@@ -249,7 +265,8 @@ while True:
                     select_mass += 1
                 if event.y < 0:
                     select_mass -= 1
-
+        
+        # Adds a bunch of random bodies when the space key is pressed
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 bodies = [Body(random.randint(0,window_size_x), random.randint(0,window_size_y), random.randint(-5.0, 5.0), random.randint(-5.0, 5.0), random.randint(1, 10)) for i in range(100)]
@@ -276,7 +293,8 @@ while True:
                     if not winner in deleted_bodies:
                         if not loser in deleted_bodies:
                             winner_loser_momentum_and_mass(winner, loser)
-                        
+
+                # Updates the speed
                 body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
     
     if mode_key == 3 and not True in hovering_list:
@@ -289,12 +307,12 @@ while True:
         if body.x_pos < 0-(body.mass) or body.x_pos > window_size_x+(body.mass) or body.y_pos < 0-(body.mass) or body.y_pos > window_size_y+(body.mass) or body in deleted_bodies:
             bodies.pop(bodies.index(body))
 
-    
     # Updates the position of the bodies and draws them to the screen
     for body in bodies:
         body.update_pos()
         body.display()
 
+        # If the mouse hovers over a body, and the mode for the user is 3 (delete), then a box will be drawn over the selected body
         if mode_key == 3:
             body.check_hover()
 
@@ -311,6 +329,7 @@ while True:
 
     screen.blit(text_surface, (0,0))
 
+    # Draws the buttons on the screen
     for button in buttons:
         button.draw_button()
 

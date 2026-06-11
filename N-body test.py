@@ -23,6 +23,13 @@ text_color = (255,255,255)
 # Font for text
 text_font = pygame.font.Font(None, 50)
 
+# Button images
+button_one = pygame.transform.scale(pygame.image.load("Button_one.png"), (55,55))
+
+button_two = pygame.transform.scale(pygame.image.load("Button_two.png"), (55,55))
+
+button_three = pygame.transform.scale(pygame.image.load("Button_three.png"), (55,55))
+
 # Figures out the resulting speed and mass of the bigger body (winner) and adds the "losing" body to a list to be deleted
 def winner_loser_momentum_and_mass(winner, loser):
     winner.speed_x = ((winner.mass * winner.speed_x) + (loser.mass * loser.speed_x)) / (winner.mass + loser.mass)
@@ -122,7 +129,7 @@ class Body:
             loser = other_body
 
         # Checks if the collision actually happened and returns based on that
-        if distance <= winner.mass + loser.mass/2:
+        if distance <= winner.mass + loser.mass/3:
             return winner, loser
         else:
             return False
@@ -131,11 +138,53 @@ class Body:
     def update_pos(self):
         self.x_pos += self.speed_x
         self.y_pos += self.speed_y
+    
+    def check_click(self):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if mouse_x > self.x_pos - (self.mass) and mouse_x < self.x_pos + (self.mass) and mouse_y > self.y_pos - (self.mass) and mouse_y < self.y_pos + (self.mass):
+                return True
+            
+        return False
+
+    def check_hover(self):
+        if mouse_x > self.x_pos - (self.mass) and mouse_x < self.x_pos + (self.mass) and mouse_y > self.y_pos - (self.mass) and mouse_y < self.y_pos + (self.mass):
+            pygame.draw.rect(screen, (255,0,0), (self.x_pos-self.mass, self.y_pos-self.mass, self.mass*2,self.mass*2), 5)
+            
+        return False
 
     # Displays the body as a circle with its mass being used as the radius
     def display(self):
         pygame.draw.circle(screen, planet_color, (self.x_pos,self.y_pos), self.mass)
 
+class Button():
+    def __init__(self, x,y, image):
+        self.x = x
+        self.y = y
+        self.image = image
+
+    def draw_button(self):
+        screen.blit(self.image, (self.x, self.y))
+
+    def check_click(self):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if mouse_x > self.x and mouse_x < self.x + 55 and mouse_y > self.y and mouse_y < self.y + 55:
+                if self.image == button_one:
+                    return 1
+                elif self.image == button_two:
+                    return 2
+                elif self.image == button_three:
+                    return 3
+            
+        return False
+    
+    def check_hover(self):
+        if mouse_x > self.x and mouse_x < self.x + 55 and mouse_y > self.y and mouse_y < self.y + 55:
+            return True
+        
+        return False
+
+
+buttons = [Button(window_size_x-165, 0, button_one), Button(window_size_x-110, 0, button_two), Button(window_size_x-55, 0, button_three)]
 
 # The list where the body objects are held
 bodies = []
@@ -151,6 +200,8 @@ hold = 0
 past_mouse_x = 0
 past_mouse_y = 0
 
+mode_key = 1
+
 # Main Game Loop
 while True:
     # Gets the mouse x and y to be used for placement code
@@ -158,37 +209,51 @@ while True:
     mouse_x = mouse[0]
     mouse_y = mouse[1]
 
+
     # Checks for user input
     for event in pygame.event.get():
+
+        hovering_list = []
+        for button in buttons:
+            button_click = button.check_click()
+            hovering_list.append(button.check_hover())
+            if button_click != False:
+                mode_key = button_click
+
         # Quits the game
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        # Stores the past position to allow the user to move their mouse to change the speed and direction of the body
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                past_mouse_x = mouse_x
-                past_mouse_y = mouse_y
-                hold = 1
-        # Computates the speed x and y of the body when it is created based on the mouse pos
-        if event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
-                
-                start_force_x, start_force_y = find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y)
-                
-                bodies.append(Body(past_mouse_x,past_mouse_y,start_force_x,start_force_y,select_mass))
 
-                hold = 0
+        if mode_key == 2 and not True in hovering_list:
+            # Stores the past position to allow the user to move their mouse to change the speed and direction of the body
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    past_mouse_x = mouse_x
+                    past_mouse_y = mouse_y
+                    hold = 1
 
-        # Changes the select_mass depending on the mousewheel
-        if event.type == pygame.MOUSEWHEEL:
-            if event.y > 0:
-                select_mass += 1
-            if event.y < 0:
-                select_mass -= 1
+            # Computates the speed x and y of the body when it is created based on the mouse pos
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    
+                    start_force_x, start_force_y = find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y)
+                    
+                    bodies.append(Body(past_mouse_x,past_mouse_y,start_force_x,start_force_y,select_mass))
+
+                    hold = 0
+
+            # Changes the select_mass depending on the mousewheel
+            if event.type == pygame.MOUSEWHEEL:
+                if event.y > 0:
+                    select_mass += 1
+                if event.y < 0:
+                    select_mass -= 1
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 bodies = [Body(random.randint(0,window_size_x), random.randint(0,window_size_y), random.randint(-5.0, 5.0), random.randint(-5.0, 5.0), random.randint(1, 10)) for i in range(100)]
+
 
     # Makes sure the select_mass variable never goes below 0
     if select_mass < 1:
@@ -196,7 +261,6 @@ while True:
    
     # Clears the screen
     screen.fill((0,0,0))
-
 
     deleted_bodies = []
     # Updates the speed of a given body by looping through every other body and updating its speed
@@ -214,6 +278,11 @@ while True:
                             winner_loser_momentum_and_mass(winner, loser)
                         
                 body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
+    
+    if mode_key == 3:
+        for body in bodies:
+            if body.check_click() == True:
+                deleted_bodies.append(body)
 
     # Checks if a body is outside the screen and removes it from the list if it is outside
     for body in bodies:
@@ -226,17 +295,24 @@ while True:
         body.update_pos()
         body.display()
 
+        if mode_key == 3:
+            body.check_hover()
+
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
-    if hold == 1:
-        pygame.draw.line(screen, line_color, (past_mouse_x,past_mouse_y), (mouse_x, mouse_y), 1)
-        pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)
-    else:
-        pygame.draw.circle(screen, planet_color, (mouse_x,mouse_y), select_mass)
+    if mode_key == 2 and not True in hovering_list:
+        if hold == 1:
+            pygame.draw.line(screen, line_color, (past_mouse_x,past_mouse_y), (mouse_x, mouse_y), 1)
+            pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)
+        else:
+            pygame.draw.circle(screen, planet_color, (mouse_x,mouse_y), select_mass)
 
     # Draws the select_mass variable in the corner and blits it
     text_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
 
     screen.blit(text_surface, (0,0))
+
+    for button in buttons:
+        button.draw_button()
 
     pygame.display.flip()
 

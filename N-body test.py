@@ -31,6 +31,13 @@ button_two = pygame.transform.scale(pygame.image.load("Button_two.png"), (55,55)
 
 button_three = pygame.transform.scale(pygame.image.load("Button_three.png"), (55,55))
 
+# Alt button images
+alt_button_one = pygame.transform.scale(pygame.image.load("Alt-Button_one.png"), (55,55))
+
+alt_button_two = pygame.transform.scale(pygame.image.load("Alt-Button_two.png"), (55,55))
+
+alt_button_three = pygame.transform.scale(pygame.image.load("Alt-Button_three.png"), (55,55))
+
 # Figures out the resulting speed and mass of the bigger body (winner) and adds the "losing" body to a list to be deleted
 def winner_loser_momentum_and_mass(winner, loser):
     winner.speed_x = ((winner.mass * winner.speed_x) + (loser.mass * loser.speed_x)) / (winner.mass + loser.mass)
@@ -169,7 +176,15 @@ class Button():
 
     # Draws the button on the screen
     def draw_button(self):
-        screen.blit(self.image, (self.x, self.y))
+        if event.type == pygame.MOUSEBUTTONDOWN and mouse_x > self.x and mouse_x < self.x + 55 and mouse_y > self.y and mouse_y < self.y + 55:
+            if self.image == button_one:
+                screen.blit(alt_button_one, (self.x, self.y))
+            elif self.image == button_two:
+                screen.blit(alt_button_two, (self.x, self.y))
+            elif self.image == button_three:
+                screen.blit(alt_button_three, (self.x, self.y))
+        else:
+            screen.blit(self.image, (self.x, self.y))
 
     # If a click happens, it returns a number to be used to change the mode_key variable. Otherwise it returns false
     def check_click(self):
@@ -269,7 +284,7 @@ while True:
         # Adds a bunch of random bodies when the space key is pressed
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bodies = [Body(random.randint(0,window_size_x), random.randint(0,window_size_y), random.randint(-5.0, 5.0), random.randint(-5.0, 5.0), random.randint(1, 10)) for i in range(100)]
+                bodies = [Body(random.uniform(0,window_size_x), random.uniform(0,window_size_y), random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0), random.randint(1, 2)) for i in range(100)]
 
 
     # Makes sure the select_mass variable never goes below 0
@@ -315,7 +330,6 @@ while True:
         # If the mouse hovers over a body, and the mode for the user is 3 (delete), then a box will be drawn over the selected body
         if mode_key == 3:
             body.check_hover()
-
 
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if mode_key == 2 and not True in hovering_list:

@@ -27,14 +27,14 @@ text_font = pygame.font.Font(None, 50)
 small_text_font = pygame.font.Font(None, 35)
 
 # Button images
-button_one = pygame.transform.scale(pygame.image.load("Button_one.png"), (55,55))
-button_two = pygame.transform.scale(pygame.image.load("Button_two.png"), (55,55))
-button_three = pygame.transform.scale(pygame.image.load("Button_three.png"), (55,55))
+button_one = pygame.transform.scale(pygame.image.load("assents/Button_one.png"), (55,55))
+button_two = pygame.transform.scale(pygame.image.load("assents/Button_two.png"), (55,55))
+button_three = pygame.transform.scale(pygame.image.load("assents/Button_three.png"), (55,55))
 
 # Alt button images
-alt_button_one = pygame.transform.scale(pygame.image.load("Alt-Button_one.png"), (55,55))
-alt_button_two = pygame.transform.scale(pygame.image.load("Alt-Button_two.png"), (55,55))
-alt_button_three = pygame.transform.scale(pygame.image.load("Alt-Button_three.png"), (55,55))
+alt_button_one = pygame.transform.scale(pygame.image.load("assents/Alt-Button_one.png"), (55,55))
+alt_button_two = pygame.transform.scale(pygame.image.load("assents/Alt-Button_two.png"), (55,55))
+alt_button_three = pygame.transform.scale(pygame.image.load("assents/Alt-Button_three.png"), (55,55))
 
 # Figures out the resulting speed and mass of the bigger body (winner) and adds the "losing" body to a list to be deleted
 def winner_loser_momentum_and_mass(winner, loser):

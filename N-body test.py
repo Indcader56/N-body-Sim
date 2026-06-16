@@ -147,21 +147,21 @@ class Body:
     # Checks if a body is clicked and returns accordingly
     def check_click(self):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if mouse_x > (self.x_pos-player_x) - (self.mass) and mouse_x < (self.x_pos-player_x) + (self.mass) and mouse_y > (self.y_pos+player_y) - (self.mass) and mouse_y < (self.y_pos+player_y) + (self.mass):
+            if mouse_x > (((self.x_pos-player_x)-self.mass)*(player_zoom/100))+window_size_x/2 and mouse_x < (((self.x_pos-player_x)+self.mass)*(player_zoom/100))+window_size_x/2 and mouse_y > (((self.y_pos+player_y)-self.mass)*(player_zoom/100))+window_size_y/2 and mouse_y < (((self.y_pos+player_y)+self.mass)*(player_zoom/100))+window_size_y/2: 
                 return True
             
         return False
 
     # Checks if the mouse is over the body. If True and mode_key is 3, then it draws a rectangle over the body
     def check_hover(self):
-        if mouse_x > (self.x_pos-player_x) - (self.mass) and mouse_x < (self.x_pos-player_x) + (self.mass) and mouse_y > (self.y_pos+player_y) - (self.mass) and mouse_y < (self.y_pos+player_y) + (self.mass):
-            pygame.draw.rect(screen, red, ((self.x_pos-player_x)-self.mass, (self.y_pos+player_y)-self.mass, self.mass*2,self.mass*2), 1)
+        if mouse_x > (((self.x_pos-player_x)-self.mass)*(player_zoom/100))+window_size_x/2 and mouse_x < (((self.x_pos-player_x)+self.mass)*(player_zoom/100))+window_size_x/2 and mouse_y > (((self.y_pos+player_y)-self.mass)*(player_zoom/100))+window_size_y/2 and mouse_y < (((self.y_pos+player_y)+self.mass)*(player_zoom/100))+window_size_y/2: 
+            pygame.draw.rect(screen, red, ((((self.x_pos-player_x)-self.mass)*(player_zoom/100))+window_size_x/2, (((self.y_pos+player_y)-self.mass)*(player_zoom/100))+window_size_y/2, (self.mass*2)*(player_zoom/100),(self.mass*2)*(player_zoom/100)), 1)
             
         return False
 
     # Displays the body as a circle with its mass being used as the radius
     def display(self):
-        pygame.draw.circle(screen, planet_color, ((self.x_pos-player_x),(self.y_pos+player_y)), self.mass)
+        pygame.draw.circle(screen, planet_color, (((self.x_pos-player_x)*(player_zoom/100))+window_size_x/2,((self.y_pos+player_y)*(player_zoom/100))+window_size_y/2), self.mass*(player_zoom/100))
 
 # The class Button which makes allows buttons to be made
 class Button():
@@ -202,6 +202,8 @@ class Button():
         
         return False
 
+
+
 # The buttons list hosts the button objects
 buttons = [Button(window_size_x-165, 0, button_one), Button(window_size_x-110, 0, button_two), Button(window_size_x-55, 0, button_three)]
 
@@ -215,7 +217,6 @@ select_mass = 1
 clock = pygame.time.Clock()
 
 # Variables for user
-hold = 0
 past_mouse_x = 0
 past_mouse_y = 0
 
@@ -232,12 +233,17 @@ mode_key = 1
 # Player position
 player_x = 0
 player_y = 0
+player_zoom = 100
 
 # Which movement button is being clicked?
 click_w = False
 click_s = False
 click_a = False
 click_d = False
+
+shift_hold = False
+left_hold = False
+right_click = False
 
 # Main Game Loop
 while True:
@@ -250,7 +256,11 @@ while True:
 
     # Checks for user input
     for event in pygame.event.get():
-        
+        # Quits the game
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
         # Goes through the button list and checks if the mouse is hovering over the buttons and checks if a click happens. If it does, it updates the mode_key variable
         hovering_list = []
         for button in buttons:
@@ -259,11 +269,6 @@ while True:
             if button_click != False:
                 mode_key = button_click
 
-        # Quits the game
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
         # Checks if the create button was pressed and makes sure you can't place bodies when you press the button
         if mode_key == 2 and not True in hovering_list:
             # Stores the past position to allow the user to move their mouse to change the speed and direction of the body
@@ -271,32 +276,51 @@ while True:
                 if event.button == 1:
                     past_mouse_x = mouse_x
                     past_mouse_y = mouse_y
-                    hold = 1
+                    left_hold = True
+
+                if event.button == 3:
+                    right_click = True
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 3:
+                    right_click = False
 
             # Cancels the placement operation if the player moves
             if click_d == True or click_w == True or click_a == True or click_s == True:
-                hold = 0
+                left_hold = False
 
             # Computates the speed x and y of the body when it is created based on the mouse pos
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and hold == 1:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and left_hold == True:
                     
                 start_force_x, start_force_y = find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y)
                 
-                bodies.append(Body(past_mouse_x+player_x,past_mouse_y-player_y,start_force_x,start_force_y,select_mass))
+                bodies.append(Body((((past_mouse_x-window_size_x/2)/(player_zoom/100))+player_x),(((past_mouse_y-window_size_y/2)/(player_zoom/100))-player_y),start_force_x,start_force_y,select_mass))
 
-                hold = 0
+                left_hold = False
 
-            # Changes the select_mass depending on the mousewheel
-            if event.type == pygame.MOUSEWHEEL:
+        # Changes the select_mass depending on the mousewheel
+        if event.type == pygame.MOUSEWHEEL:
+            if right_click == True and mode_key == 2:
+                if shift_hold == True:
+                    if event.y > 0:
+                        select_mass += 10
+                    if event.y < 0:
+                        select_mass -= 10
+                else:
+                    if event.y > 0:
+                        select_mass += 1
+                    if event.y < 0:
+                        select_mass -= 1
+            else:
                 if event.y > 0:
-                    select_mass += 1
+                    player_zoom += (2*math.ceil(player_zoom/100)) 
                 if event.y < 0:
-                    select_mass -= 1
+                    player_zoom -= (2*math.ceil(player_zoom/100)) 
         
         # Adds a bunch of random bodies when the space key is pressed
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bodies = [Body(random.uniform(0,window_size_x), random.uniform(0,window_size_y), random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0), random.randint(1, 2)) for i in range(100)]
+                bodies = [Body(random.randint(0,window_size_x), random.randint(0,window_size_y), 0, 0, random.randint(2, 10)) for i in range(100)]
             
             # Updates the click values to tell if the user is holding down one of these buttons
             if event.key == pygame.K_d:
@@ -307,6 +331,8 @@ while True:
                 click_w = True
             if event.key == pygame.K_s:
                 click_s = True
+            if event.key == pygame.K_LSHIFT:
+                shift_hold = True
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
@@ -317,6 +343,8 @@ while True:
                 click_w = False
             if event.key == pygame.K_s:
                 click_s = False
+            if event.key == pygame.K_LSHIFT:
+                shift_hold = False
 
     # Changes the player position when one of the buttons are being held
     if click_d == True:
@@ -331,12 +359,17 @@ while True:
     # Makes sure the select_mass variable never goes below 0
     if select_mass < 1:
         select_mass = 1
+    
+    if player_zoom < 2:
+        player_zoom = 2
+    if player_zoom > 10000:
+        player_zoom = 10000
    
     # Clears the screen
     screen.fill((0,0,0))
 
     deleted_bodies = []
-    # Updates the speed of a given body by looping through every other body and updating its speed
+    # Updates the speed of a given body by looping through every other body and checking attraction
     for body in bodies:
         for other_body in bodies:
             if not body == other_body:
@@ -361,7 +394,7 @@ while True:
 
     # Deletes any bodies in the deleted_bodies list
     for body in deleted_bodies:
-        #if body.x_pos < 0-(body.mass) or body.x_pos > window_size_x+(body.mass) or body.y_pos < 0-(body.mass) or body.y_pos > window_size_y+(body.mass):
+
         if body in bodies:
             bodies.remove(body)
 
@@ -376,11 +409,11 @@ while True:
 
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if mode_key == 2 and not True in hovering_list:
-        if hold == 1:
+        if left_hold == True:
             pygame.draw.line(screen, line_color, (past_mouse_x,past_mouse_y), (mouse_x, mouse_y), 1)
-            pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass)
+            pygame.draw.circle(screen, planet_color, (past_mouse_x,past_mouse_y), select_mass*(player_zoom/100))
         else:
-            pygame.draw.circle(screen, planet_color, (mouse_x,mouse_y), select_mass)
+            pygame.draw.circle(screen, planet_color, (mouse_x,mouse_y), select_mass*(player_zoom/100))
     
     # Draws the select_mass variable in the corner and blits it, also draws the x and y position of the player
     mass_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
@@ -388,13 +421,19 @@ while True:
     x_surface = small_text_font.render(f"x: {player_x}", True, text_color)
     y_surface = small_text_font.render(f"y: {player_y}", True, text_color)
 
-    screen.blit(mass_surface, (0,0))
+    zoom_surface = small_text_font.render(f"zoom: {player_zoom}", True, text_color)
+
+    if mode_key == 2:
+        screen.blit(mass_surface, (0,0))
 
     screen.blit(x_surface, (10,window_size_y-30))
     screen.blit(y_surface, (70+(len(str(player_x))*10),window_size_y-30))
+
+    screen.blit(zoom_surface, (10,window_size_y-60))
 
     # Draws the buttons on the screen
     for button in buttons:
         button.draw_button()
 
     pygame.display.flip()
+

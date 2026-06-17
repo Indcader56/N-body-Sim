@@ -4,6 +4,8 @@ import sys
 import random
 import math
 
+import physics
+
 # Initalizing stuff
 pygame.init()
 pygame.font.init()
@@ -36,6 +38,7 @@ alt_button_one = pygame.transform.scale(pygame.image.load("assents/Alt-Button_on
 alt_button_two = pygame.transform.scale(pygame.image.load("assents/Alt-Button_two.png"), (55,55))
 alt_button_three = pygame.transform.scale(pygame.image.load("assents/Alt-Button_three.png"), (55,55))
 
+"""
 # Figures out the resulting speed and mass of the bigger body (winner) and adds the "losing" body to a list to be deleted
 def winner_loser_momentum_and_mass(winner, loser):
     # Changes the x and y position of the winning body to a point that lines between the two bodies with a ratio of loser.mass/winner.mass
@@ -103,7 +106,7 @@ def find_distance_componets(past_x, past_y, current_x, current_y):
     start_force_x, start_force_y = final_x_y_componets(distance, angle)
 
     return start_force_x, start_force_y
-
+"""
 
 # Body class
 class Body:
@@ -119,7 +122,7 @@ class Body:
     # Updates the speed x and y variables to account for another mass
     def update_speed(self, other_x, other_y, other_mass):
         # Finds the fx and fy componets
-        force_componets = find_force_componets(self.x_pos, self.y_pos, self.mass, other_x, other_y, other_mass)
+        force_componets = physics.find_force_componets(self.x_pos, self.y_pos, self.mass, other_x, other_y, other_mass)
 
         # Changes the speed x and y variables by the forces
         self.speed_x += (force_componets[0] / self.mass) * dt
@@ -148,6 +151,7 @@ class Body:
     def update_pos(self):
         self.x_pos += self.speed_x * dt
         self.y_pos += self.speed_y * dt
+
 
     # Checks if a body is clicked and returns accordingly
     def check_click(self):
@@ -282,7 +286,6 @@ slider_hold = False
 # Main Game Loop
 while True:
     dt = clock.tick(60) / 1000
-
     # Gets the mouse x and y to be used for placement code
     mouse = pygame.mouse.get_pos()
     mouse_x = mouse[0]
@@ -308,8 +311,7 @@ while True:
             hovering_list.append(mass_slider.check_hover())
             if slider_hold == True:
                 mass_slider.current = mouse_x-mass_slider.x
-
-            select_mass = mass_slider.current
+                select_mass = mass_slider.current
 
         # Checks if the create button was pressed and makes sure you can't place bodies when you press the button
         if mode_key == 2 and not True in hovering_list:
@@ -334,7 +336,7 @@ while True:
             # Computates the speed x and y of the body when it is created based on the mouse pos
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1 and left_hold == True:
                     
-                start_force_x, start_force_y = find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y)
+                start_force_x, start_force_y = physics.find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y, select_mass)
                 
                 bodies.append(Body((((past_mouse_x-window_size_x/2)/(player_zoom/100))+player_x),(((past_mouse_y-window_size_y/2)/(player_zoom/100))-player_y),start_force_x,start_force_y,select_mass, random_color))
                 
@@ -413,7 +415,7 @@ while True:
                     # Checks if the winner/loser is in the deleted list so that the function doesn't run twice
                     if not winner in deleted_bodies:
                         if not loser in deleted_bodies:
-                            winner_loser_momentum_and_mass(winner, loser)
+                            deleted_bodies.append(physics.winner_loser_momentum_and_mass(winner, loser))
 
                 # Updates the speed
                 body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)

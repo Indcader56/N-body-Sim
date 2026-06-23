@@ -29,8 +29,8 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
     # Finds the distance between the other body and the current body
     distance = find_distance(other_x, other_y, self_x, self_y)
 
-    # Finds the resulting force exerted on the current body using the Law of Gravitation (setting the gravitational constant to a basic 1000)
-    g = 5000
+    # Finds the resulting force exerted on the current body using the Law of Gravitation (setting the gravitational constant to a basic 10)
+    g = 25
     try:
         force = g*((other_mass*self_mass)/(distance**2))
     except ZeroDivisionError:
@@ -48,12 +48,12 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
     return force_x, force_y
 
 # Finds the distance between two points: used for finding the starting speed of a body when placed
-def find_distance_componets(past_x, past_y, current_x, current_y, s_mass):
+def find_distance_componets(past_x, past_y, current_x, current_y, s_mass, zoom):
     # Finds the distance between the past mouse pos and the current mouse pos
     distance = find_distance(past_x, past_y, current_x, current_y)
 
-    if distance >= s_mass:
-        distance -= s_mass
+    if distance >= s_mass*(zoom/100):
+        distance -= s_mass*(zoom/100)
     else:
         return 0,0
 
@@ -66,4 +66,4 @@ def find_distance_componets(past_x, past_y, current_x, current_y, s_mass):
     # Finds the start force x and y and uses it to make the new object
     start_force_x, start_force_y = final_x_y_componets(distance, angle)
 
-    return start_force_x, start_force_y
+    return start_force_x*  ((100-(zoom/100))/2000), start_force_y * ((100-(zoom/100))/2000)

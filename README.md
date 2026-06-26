@@ -11,6 +11,7 @@ Right now its a good gravity sim, possibly going to finalize it soon after
 adding a few more features
 
 Controls:
+
 WASD - move
 
 Scroll - Changes zoom when mouse is over play area.

@@ -191,6 +191,8 @@ while True:
         # Adds True values to the hovering_list if its over the mass text or the zoom text
         if mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
             hovering_list.append(True)
+        if mouse_x < 175 and mouse_y < 75 and mode_key == 2:
+            hovering_list.append(True)
 
         # Logic for when in creation mode
         if mode_key == 2 and not True in hovering_list:
@@ -237,33 +239,55 @@ while True:
         if event.type == pygame.MOUSEWHEEL:
             # If the mouse is near the mass text and the user scrolls, then select mass changes
             if mouse_x < 175 and mouse_y < 75 and mode_key == 2:
-                if event.y  > 0:
-                    select_mass += event.y
-                if event.y < 0:
-                    select_mass += event.y
+                if shift_hold == True:
+                    if event.y  > 0:
+                        select_mass += 10
+                    if event.y < 0:
+                        select_mass -= 10
+                else:
+                    if event.y  > 0:
+                        select_mass += 1
+                    if event.y < 0:
+                        select_mass -= 1
             # If the mouse is near the time text and the user scrolls, then the rate of time changes
             elif mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
-                if event.y > 0:
-                    time += 1
-                if event.y < 0:
-                    time -= 1
+                if shift_hold == True:
+                    if event.y > 0:
+                        time += 10
+                    if event.y < 0:
+                        time -= 10
+                else:
+                    if event.y > 0:
+                        time += 1
+                    if event.y < 0:
+                        time -= 1
             # If the mouse is in the normal play area, then the zoom changes
             else:
                 if event.y > 0:
-                    player_zoom += event.y
+                    player_zoom += 10
                 if event.y < 0:
-                    player_zoom += event.y
+                    player_zoom -= 10
 
-        # Pauses and plays time when the time text is clicked
+        # Pauses and plays time when the time text is clicked and resets the select_mass variable when that text is clicked
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
                     if time > 0:
                         past_time = int(time)
                         time = 0
+
                     elif time == 0:
                         time = past_time
                         past_time = 0
+
+                if mouse_x < 175 and mouse_y < 75 and mode_key == 2:
+                    if select_mass > 1:
+                        past_select_mass = int(select_mass)
+                        select_mass = 1
+
+                    elif select_mass == 1:
+                        select_mass = past_select_mass
+                        past_select_mass = 1
         
         # Adds a bunch of random bodies when the space key is pressed
         if event.type == pygame.KEYDOWN:
@@ -316,8 +340,8 @@ while True:
     # Makes sure the select_mass variable never goes below 0 or above 200
     if select_mass < 1:
         select_mass = 1
-    if select_mass > 4000:
-        select_mass = 4000
+    if select_mass > 5000:
+        select_mass = 5000
 
     # Makes sure the time variable never goes below 0 or above 100
     if time < 0:
@@ -378,7 +402,7 @@ while True:
             pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), math.sqrt(select_mass)*(player_zoom/100))
 
     # Draws the circle if its hovering over the mass slider so that the user can see a satisfiying increase in size of the mouse's body
-    if mode_key == 2 and hovering_list[-2] == True:
+    if mode_key == 2 and hovering_list[-1] == True:
         pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), math.sqrt(select_mass)*(player_zoom/100))
     
     # Creates the select_mass surface

@@ -52,8 +52,8 @@ def find_distance_componets(past_x, past_y, current_x, current_y, s_mass, zoom):
     # Finds the distance between the past mouse pos and the current mouse pos
     distance = find_distance(past_x, past_y, current_x, current_y)
 
-    if distance >= s_mass*(zoom/100):
-        distance -= s_mass*(zoom/100)
+    if distance >= math.sqrt(s_mass)*(zoom/100):
+        distance -= math.sqrt(s_mass)*(zoom/100)
     else:
         return 0,0
 
@@ -64,6 +64,6 @@ def find_distance_componets(past_x, past_y, current_x, current_y, s_mass, zoom):
     angle = math.atan2(y_side, x_side)
 
     # Finds the start force x and y and uses it to make the new object
-    start_force_x, start_force_y = final_x_y_componets(distance, angle)
+    start_force_x, start_force_y = final_x_y_componets(math.sqrt(distance), angle)
 
-    return start_force_x*  ((100-(zoom/100))/2000), start_force_y * ((100-(zoom/100))/2000)
+    return start_force_x, start_force_y

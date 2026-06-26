@@ -64,7 +64,7 @@ class Body:
         distance = math.sqrt(((other.x_pos-self.x_pos)**2) + ((other.y_pos-self.y_pos)**2))
 
         # Determines the winner of the collision
-        if other.mass > self.mass:
+        if other.mass > math.sqrt(self.mass):
             winner = other
             loser = self
         else:
@@ -72,7 +72,7 @@ class Body:
             loser = other
 
         # Checks if the collision actually happened and returns based on that
-        if distance <= winner.mass + loser.mass:
+        if distance <= math.sqrt(winner.mass) + math.sqrt(loser.mass):
             return winner, loser
         else:
             return False
@@ -84,7 +84,7 @@ class Body:
 
     # Displays the body as a circle with its mass being used as the radius
     def display(self):
-        pygame.draw.circle(screen, self.color, (((self.x_pos-player_x)*(player_zoom/100))+window_size_x/2,((self.y_pos+player_y)*(player_zoom/100))+window_size_y/2), self.mass*(player_zoom/100))
+        pygame.draw.circle(screen, self.color, (((self.x_pos-player_x)*(player_zoom/100))+window_size_x/2,((self.y_pos+player_y)*(player_zoom/100))+window_size_y/2), math.sqrt(self.mass)*(player_zoom/100))
 
 # The class Button which makes allows buttons to be made
 class Button():
@@ -105,20 +105,6 @@ class Button():
         else:
             screen.blit(self.image, (self.x, self.y))
 
-# The class slider which constructs a slider object
-class Slider():
-    def __init__(self, x,y, current, limit):
-        self.x = x
-        self.y = y
-        self.current = current
-        self.limit = limit
-    
-    def draw_slider(self):
-        pygame.draw.line(screen, line_color, (self.x,self.y), (self.x+self.limit,self.y), 5)
-        pygame.draw.circle(screen, line_color, (self.x+self.current,self.y), 10)
-
-# Sliders allow users to change variables like select_mass and time 
-sliders = [Slider(10,50,0, 200), Slider(window_size_x-120,window_size_y-20,0, 100)]
 # The buttons list hosts the button objects that can be clicked on to change the mode
 buttons = [Button(window_size_x-165, 0, button_one), Button(window_size_x-110, 0, button_two), Button(window_size_x-55, 0, button_three)]
 
@@ -183,18 +169,6 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        """
-        These areas of code are so inefficent/crptic since they used
-        to come from the classes. Definiety need to simplify and refactor
-        """
-
-        # Adds bodies to the chopping block (deleted_bodies list) if they were clicked on in deletion mode
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if mode_key == 3 and not True in hovering_list:
-                for body in bodies:
-                    if mouse_x > (((body.x_pos-player_x)-body.mass)*(player_zoom/100))+window_size_x/2 and mouse_x < (((body.x_pos-player_x)+body.mass)*(player_zoom/100))+window_size_x/2 and mouse_y > (((body.y_pos+player_y)-body.mass)*(player_zoom/100))+window_size_y/2 and mouse_y < (((body.y_pos+player_y)+body.mass)*(player_zoom/100))+window_size_y/2: 
-                        deleted_bodies.append(body)
-
 
         # Goes through the button list and checks if the mouse is hovering over the buttons and checks if a click happens. If it does, it updates the mode_key variable
         hovering_list = []
@@ -214,43 +188,11 @@ while True:
             else:
                 hovering_list.append(False)
 
-        # Slider logic
-        for slider in sliders:
-            # Keeps the slider's current value within the bounds
-            if slider.current > slider.limit:
-                slider.current = slider.limit
-            elif slider.current < 0:
-                slider.current = 0
+        # Adds True values to the hovering_list if its over the mass text or the zoom text
+        if mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
+            hovering_list.append(True)
 
-                # Resets select_mass and time variables, may not be needed tbh :/
-                if sliders.index(slider) == 0:
-                    select_mass = 1
-                elif sliders.index(slider) == 1:
-                    time = 0
-            
-            # Basically checks if the given slider is being held
-            if mouse_x > (slider.x+slider.current)-14 and mouse_x < (slider.x+slider.current)+14 and mouse_y > slider.y-14 and mouse_y < slider.y + 14:
-                if not slider.current > slider.limit and not slider.current < 0:
-                    slider_hold = pygame.mouse.get_pressed()[0]
-            else:
-                slider_hold = False
-
-            # Checks if the mouse is over the slider and appends the result to the hovering_list
-            if mouse_x > (slider.x+slider.current)-14 and mouse_x < (slider.x+slider.current)+14 and mouse_y > slider.y-14 and mouse_y < slider.y + 14:
-                hovering_list.append(True)
-            else:
-                hovering_list.append(False)
-
-            # Updates the slider variables when the given slider is dragged
-            if slider_hold == True:
-                slider.current = mouse_x-slider.x
-                if sliders.index(slider) == 0:
-                    select_mass = slider.current
-                elif sliders.index(slider) == 1:
-                    time = slider.current
-        
-
-        # Checks if the create button was pressed and makes sure you can't place bodies when you press the button
+        # Logic for when in creation mode
         if mode_key == 2 and not True in hovering_list:
             # Stores the past position to allow the user to move their mouse to change the speed and direction of the body
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -267,7 +209,7 @@ while True:
                     right_click = False
 
             # Cancels the placement operation if the player moves
-            if click_d == True or click_w == True or click_a == True or click_s == True:
+            if click_d == True or click_w == True or click_a == True or click_s == True or shift_hold == True:
                 left_hold = False
 
             # Computates the speed x and y of the body when it is created based on the mouse pos
@@ -281,18 +223,61 @@ while True:
 
                 left_hold = False
 
-        # Changes the select_mass depending on the mousewheel
+        # Deletion mode logic
+        if mode_key == 3 and not True in hovering_list:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    for body in bodies:
+                        if physics.find_distance(((body.x_pos-player_x)*(player_zoom/100))+(window_size_x/2), ((body.y_pos+player_y)*(player_zoom/100))+(window_size_y/2), mouse_x, mouse_y) <= math.sqrt(body.mass)*(player_zoom/100):
+                            deleted_bodies.append(body)
+
+        # Independent Logic
+        
+        # Changes the variables based on the mouse's location
         if event.type == pygame.MOUSEWHEEL:
-            if event.y > 0:
-                player_zoom += 10
-            if event.y < 0:
-                player_zoom -= 10
+            # If the mouse is near the mass text and the user scrolls, then select mass changes
+            if mouse_x < 175 and mouse_y < 75 and mode_key == 2:
+                if event.y  > 0:
+                    select_mass += event.y
+                if event.y < 0:
+                    select_mass += event.y
+            # If the mouse is near the time text and the user scrolls, then the rate of time changes
+            elif mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
+                if event.y > 0:
+                    time += 1
+                if event.y < 0:
+                    time -= 1
+            # If the mouse is in the normal play area, then the zoom changes
+            else:
+                if event.y > 0:
+                    player_zoom += event.y
+                if event.y < 0:
+                    player_zoom += event.y
+
+        # Pauses and plays time when the time text is clicked
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
+                    if time > 0:
+                        past_time = int(time)
+                        time = 0
+                    elif time == 0:
+                        time = past_time
+                        past_time = 0
         
         # Adds a bunch of random bodies when the space key is pressed
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bodies = [Body(random.randint(-window_size_y,window_size_x), random.randint(-window_size_y,window_size_y), 0, 0, random.randint(2, 10),(random.randint(15,255),random.randint(15,255),random.randint(15,255))) for i in range(100)]
-            
+                for i in range(200):
+                    rnd_x = random.uniform(-1000,1000)
+                    rnd_y = random.uniform(-1000,1000)
+
+                    rnd_clr = (random.uniform(10,255),random.uniform(10,255),random.uniform(10,255))
+
+                    rnd_mass = random.uniform(2,10)
+
+                    bodies.append(Body(rnd_x,rnd_y,0,0,rnd_mass, rnd_clr))
+                
             # Updates the click values to tell if the user is holding down one of these buttons
             if event.key == pygame.K_d:
                 click_d = True
@@ -331,8 +316,8 @@ while True:
     # Makes sure the select_mass variable never goes below 0 or above 200
     if select_mass < 1:
         select_mass = 1
-    if select_mass > 200:
-        select_mass = 200
+    if select_mass > 4000:
+        select_mass = 4000
 
     # Makes sure the time variable never goes below 0 or above 100
     if time < 0:
@@ -381,20 +366,20 @@ while True:
 
         # If the mouse hovers over a body, and the mode for the user is 3 (delete), then a box will be drawn over the selected body
         if mode_key == 3:
-            if mouse_x > (((body.x_pos-player_x)-body.mass)*(player_zoom/100))+window_size_x/2 and mouse_x < (((body.x_pos-player_x)+body.mass)*(player_zoom/100))+window_size_x/2 and mouse_y > (((body.y_pos+player_y)-body.mass)*(player_zoom/100))+window_size_y/2 and mouse_y < (((body.y_pos+player_y)+body.mass)*(player_zoom/100))+window_size_y/2: 
-                pygame.draw.rect(screen, red, ((((body.x_pos-player_x)-body.mass)*(player_zoom/100))+window_size_x/2, (((body.y_pos+player_y)-body.mass)*(player_zoom/100))+window_size_y/2, (body.mass*2)*(player_zoom/100),(body.mass*2)*(player_zoom/100)), 1)
-
+            if physics.find_distance(((body.x_pos-player_x)*(player_zoom/100))+(window_size_x/2), ((body.y_pos+player_y)*(player_zoom/100))+(window_size_y/2), mouse_x, mouse_y) <= math.sqrt(body.mass)*(player_zoom/100):
+                pygame.draw.rect(screen,red, ((((body.x_pos-player_x)-math.sqrt(body.mass))*(player_zoom/100)) + window_size_x/2, (((body.y_pos+player_y)-math.sqrt(body.mass))*(player_zoom/100))+window_size_y/2, (math.sqrt(body.mass)*2)*(player_zoom / 100),(math.sqrt(body.mass)*2)*(player_zoom / 100)), 1)
+    
     # Draws a circle to show the user what body will be placed and shows a line to show which direction and how fast will it go
     if mode_key == 2 and not True in hovering_list:
         if left_hold == True:
             pygame.draw.line(screen, line_color, (past_mouse_x,past_mouse_y), (mouse_x, mouse_y), 1)
-            pygame.draw.circle(screen, random_color, (past_mouse_x,past_mouse_y), select_mass*(player_zoom/100))
+            pygame.draw.circle(screen, random_color, (past_mouse_x,past_mouse_y), math.sqrt(select_mass)*(player_zoom/100))
         else:
-            pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), select_mass*(player_zoom/100))
+            pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), math.sqrt(select_mass)*(player_zoom/100))
 
     # Draws the circle if its hovering over the mass slider so that the user can see a satisfiying increase in size of the mouse's body
     if mode_key == 2 and hovering_list[-2] == True:
-        pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), select_mass*(player_zoom/100))
+        pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), math.sqrt(select_mass)*(player_zoom/100))
     
     # Creates the select_mass surface
     mass_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
@@ -407,30 +392,23 @@ while True:
     zoom_surface = small_text_font.render(f"zoom: {player_zoom}", True, text_color)
 
     # Creates the time surface
-    time_surface = small_text_font.render(f"time: {time/10}", True, text_color)
+    time_surface = small_text_font.render(f"time: {time}", True, text_color)
 
     # Draws the mass variable if the user is in creation mode (mode_key == 2)
     if mode_key == 2:
         screen.blit(mass_surface, (0,0))
 
     # Draws the x and y variables
-    screen.blit(x_surface  , (10,window_size_y-30))
-    screen.blit(y_surface, (70+(len(str(player_x))*10),window_size_y-30))
+    screen.blit(x_surface, (10,window_size_y-30))
+    screen.blit(y_surface, (70+(len(str(player_x))*10),window_size_y-30))   
 
     # Draws the zoom and time variables
     screen.blit(zoom_surface, (10,window_size_y-60))
-    screen.blit(time_surface, (window_size_x-125,window_size_y-60))
+    screen.blit(time_surface, (window_size_x-120,window_size_y-30))
 
     # Draws the buttons on the screen
     for button in buttons:
         button.draw_button()
-
-    # Draws the mass slider if in creation mode
-    if mode_key == 2:
-        sliders[0].draw_slider()
-
-    # Draws the time slider
-    sliders[1].draw_slider()
 
     pygame.display.flip()
 

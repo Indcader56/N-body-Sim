@@ -38,6 +38,10 @@ Button Three (minus) - Allows the user to delete bodies by clicking
 
 V - enables/disables gui
 
+If you wanna see a video of it working:
+https://www.youtube.com/watch?v=UsZ2oN7yn8g
+
+
 Space - Adds a bunch of random bodies
 
 Q - Deletes all bodies

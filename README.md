@@ -1,5 +1,7 @@
 # N-body-Sim
-A N-body sim where users can place bodies and eventually be able to make systems in a open area. 
+A N-body sim where users can place bodies and can make planetary systems
+
+<img width="720" height="500" alt="Recording 2026-06-27 143654" src="https://github.com/user-attachments/assets/7417659e-8507-4dcf-9d4a-8f339aa1e3c2" />
 
 Right now the game
  * Allows users to place and delete planetary bodies
@@ -9,6 +11,7 @@ Right now the game
 
 Right now its a good gravity sim, possibly going to finalize it soon after
 adding a few more features
+
 
 Controls:
 

@@ -4,11 +4,13 @@ import sys
 import random
 import math
 
+# Import physics.py
 import physics
 
 # Initalizing stuff
 pygame.init()
 pygame.font.init()
+
 
 window_size_x = 960
 window_size_y = 720
@@ -24,9 +26,8 @@ text_color = (255,255,255)
 red = (255,0,0)
 
 # Font for text
-text_font = pygame.font.Font(None, 50)
-
-small_text_font = pygame.font.Font(None, 35)
+text_font = pygame.font.SysFont(None, 50)
+small_text_font = pygame.font.SysFont(None, 35)
 
 # Button images
 button_one = pygame.transform.scale(pygame.image.load("assents/Button_one.png"), (55,55))
@@ -109,6 +110,22 @@ class Button():
         else:
             screen.blit(self.image, (self.x, self.y))
 
+def typer(variable, input, type):
+    if event.key == pygame.K_BACKSPACE:
+        input = input[:-1]
+    elif event.key == pygame.K_RETURN:
+        if len(input) == 0:
+            variable = 0
+        else:
+            variable = int(input)
+        input = ""
+        type = False
+    else:
+        if event.unicode.isdigit():
+            input += event.unicode
+
+    return variable, input, type
+
 # The buttons list hosts the button objects that can be clicked on to change the mode
 buttons = [Button(window_size_x-165, 0, button_one), Button(window_size_x-110, 0, button_two), Button(window_size_x-55, 0, button_three)]
 
@@ -157,10 +174,19 @@ right_click = False
 slider_hold = False
 
 time = 0
+past_time = 0
+
+frame = 0
+
+mass_input = ""
+time_input = ""
+
+mass_type = False
+time_type = False
 
 # Main Game Loop
 while True:
-    # Delta time for physics calculations
+    # Delta time to maintain a fixed simulation speed
     dt = clock.tick(60) / 1000
     # Gets the mouse x and y to be used for placement code
     mouse = pygame.mouse.get_pos()
@@ -241,72 +267,43 @@ while True:
                             deleted_bodies.append(body)
 
         # Independent Logic
-        
-        # Changes the variables based on the mouse's location
-        if event.type == pygame.MOUSEWHEEL:
-            # If the mouse is near the mass text and the user scrolls, then select mass changes
-            if mouse_x < 175 and mouse_y < 75 and mode_key == 2 and view_mode == 0:
-                if shift_hold == True:
-                    if event.y  > 0:
-                        select_mass += 10
-                    if event.y < 0:
-                        select_mass -= 10
-                else:
-                    if event.y > 0:
-                        select_mass += 1
-                    if event.y < 0:
-                        select_mass -= 1
-            # If the mouse is near the time text and the user scrolls, then the rate of time changes
-            elif mouse_x > window_size_x-125 and mouse_y > window_size_y-45 and view_mode == 0:
-                if shift_hold == True:
-                    if event.y > 0:
-                        time += 10
-                    if event.y < 0:
-                        time -= 10
-                else:
-                    if event.y > 0:
-                        time += 1
-                    if event.y < 0:
-                        time -= 1
-            # If the mouse is in the normal play area, then the zoom changes
-            else:
-                if event.y > 0:
-                    player_zoom += 10
-                if event.y < 0:
-                    player_zoom -= 10
 
-        # Pauses and plays time when the time text is clicked and resets the select_mass variable when that text is clicked
-        if event.type == pygame.MOUSEBUTTONDOWN and view_mode == 0:
+        # Activates typing mode when the text is clicked
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                if mouse_x > window_size_x-125 and mouse_y > window_size_y-45:
-                    if time > 0:
-                        past_time = int(time)
-                        time = 0
+                # FOR MASS
+                if mouse_x < 175 and mouse_y < 75 and mode_key == 2 and view_mode == 0 and time_type == False:
+                    mass_type = True
+                # FOR TIME
+                elif mouse_x > window_size_x-125 and mouse_y > window_size_y-45 and view_mode == 0 and mass_type == False:
+                    time_type = True
 
-                    elif time == 0:
-                        time = past_time
-                        past_time = 0
+        # Allows the user to type in input for the time and mass variables
+        if event.type == pygame.KEYDOWN:
+            if mass_type == True:
+                select_mass, mass_input, mass_type = typer(select_mass, mass_input, mass_type)            
 
-                if mouse_x < 175 and mouse_y < 75 and mode_key == 2:
-                    if select_mass > 1:
-                        past_select_mass = int(select_mass)
-                        select_mass = 1
-
-                    elif select_mass == 1:
-                        select_mass = past_select_mass
-                        past_select_mass = 1
+            if time_type == True:
+                time, time_input, time_type = typer(time, time_input, time_type)
+        
+        # Changes zoom via mousewheel
+        if event.type == pygame.MOUSEWHEEL:
+            if event.y > 0:
+                player_zoom += 10
+            if event.y < 0:
+                player_zoom -= 10
         
         # Adds a bunch of random bodies when the space key is pressed
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 bodies = []
-                for i in range(200):
+                for i in range(50):
                     rnd_x = random.uniform(-1000,1000)
                     rnd_y = random.uniform(-1000,1000)
 
                     rnd_clr = (random.uniform(10,255),random.uniform(10,255),random.uniform(10,255))
 
-                    rnd_mass = random.uniform(2,10)
+                    rnd_mass = random.uniform(100,1000)
 
                     bodies.append(Body(rnd_x,rnd_y,0,0,rnd_mass, rnd_clr))
 
@@ -314,6 +311,14 @@ while True:
             if event.key == pygame.K_q:
                 for body in bodies:
                     deleted_bodies.append(body)
+
+            if event.key == pygame.K_p:
+                if time > 0:
+                    past_time = int(time)
+                    time = 0
+                else:
+                    time = int(past_time)
+                    past_time = 0
 
             # Enables and disables the view mode variable which gets rid of excess menus and variables for viewing pleasure
             if event.key == pygame.K_v:
@@ -357,6 +362,7 @@ while True:
     if click_s == True:
         player_y -= 10
 
+
     # Makes sure the select_mass variable never goes below 0 or above 200
     if select_mass < 1:
         select_mass = 1
@@ -374,7 +380,7 @@ while True:
         player_zoom = 10
     if player_zoom > 10000:
         player_zoom = 10000
-   
+
     # Clears the screen
     screen.fill((0,0,0))
 
@@ -426,9 +432,18 @@ while True:
     # Draws the circle if its hovering over the mass slider so that the user can see a satisfiying increase in size of the mouse's body
     if mode_key == 2 and hovering_list[-1] == True and view_mode == 0:
         pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), math.sqrt(select_mass)*(player_zoom/100))
-    
+
     # Creates the select_mass surface
-    mass_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
+    if mass_type == True:
+        mass_surface = text_font.render(f"Mass: {mass_input}", True, text_color)
+    else:
+        mass_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
+
+    # Creates the time surface
+    if time_type == True:
+        time_surface = small_text_font.render(f"time: {time_input}", True, text_color)
+    else:
+        time_surface = small_text_font.render(f"time: {time}", True, text_color)
 
     # Creates the x and y surfaces
     x_surface = small_text_font.render(f"x: {player_x}", True, text_color)
@@ -436,9 +451,6 @@ while True:
 
     # Creates the zoom surface
     zoom_surface = small_text_font.render(f"zoom: {player_zoom}", True, text_color)
-
-    # Creates the time surface
-    time_surface = small_text_font.render(f"time: {time}", True, text_color)
 
     if view_mode == 0:
         # Draws the mass variable if the user is in creation mode (mode_key == 2)

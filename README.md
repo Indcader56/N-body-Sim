@@ -9,8 +9,7 @@ Right now the game
  * Calculates gravitation attraction and momentum from collisions
  * Allows the player to manipulate the rate of time and the camera's position in the world
 
-Right now its a good gravity sim, possibly going to finalize it soon after
-adding a few more features
+Right now its a good gravity sim. :3
 
 
 Controls:
@@ -18,25 +17,24 @@ Controls:
 WASD - move
 
 Scroll - Changes zoom when mouse is over play area.
-         However, if hovering over mass text, then 
-         the mass variable is changed and if hovering
-         over the rate of time variable, then it changes
-         the rate of time.
-         
-LShift - Changes the rate of change for the mass and time 
-         variables when holding it to be faster.
 
-Button One (mouse) - When clicked on, it disables any extra 
-                     controls.
+Left Click - When clicking on the text for the Mass variable or the 
+             Time variable it now allows you to type in the desired
+             amounts.
+
+Button One (mouse icon) - When clicked on, it disables any extra 
+                          controls. 
                      
-Button Two (plus) - When clicked on, it allows the user to
-                    place bodies and by dragging shoot them
-                    in a certain direction.
+Button Two (plus icon) - When clicked on, it allows the user to
+                         place bodies and by dragging shoot them
+                         in a certain direction.
                     
-Button Three (minus) - Allows the user to delete bodies by clicking
-                       on them.
+Button Three (minus icon) - Allows the user to delete bodies by 
+                            clicking on them.
 
 V - enables/disables gui
+
+P - Pauses and plays the simulation
 
 Space - Adds a bunch of random bodies
 

@@ -1,15 +1,13 @@
 # N-body-Sim
 A N-body sim where users can place bodies and can make planetary systems
 
-<img width="700" height="500" alt="Recording 2026-06-27 143654" src="https://github.com/user-attachments/assets/7417659e-8507-4dcf-9d4a-8f339aa1e3c2" />
+<img width="898" height="703" alt="Recording 2026-07-31 151719" src="https://github.com/user-attachments/assets/59a7f1e2-91fa-4374-b9fd-fdc325886f58" />
 
 Right now the game
  * Allows users to place and delete planetary bodies
  * Allows users to shoot the bodies by dragging
  * Calculates gravitation attraction and momentum from collisions
  * Allows the player to manipulate the rate of time and the camera's position in the world
-
-Right now its a good gravity sim. :3
 
 
 Controls:

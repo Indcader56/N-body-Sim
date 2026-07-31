@@ -1,7 +1,8 @@
 # N-body-Sim
 A N-body sim where users can place bodies and can make planetary systems
 
-<img width="898" height="703" alt="Recording 2026-07-31 151719" src="https://github.com/user-attachments/assets/59a7f1e2-91fa-4374-b9fd-fdc325886f58" />
+<img width="720" height="558" alt="Recording 2026-07-31 152529" src="https://github.com/user-attachments/assets/d894ca6e-fed4-4068-9b20-9bbbcc3fbeb2" />
+
 
 Right now the game
  * Allows users to place and delete planetary bodies

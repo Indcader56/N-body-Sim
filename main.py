@@ -42,13 +42,14 @@ alt_button_three = pygame.transform.scale(pygame.image.load("assents/Alt-Button_
 # Body class
 class Body:
     # Initalizes variables needed for a given body
-    def __init__(self, x_pos, y_pos, speed_x, speed_y, mass, color):
+    def __init__(self, x_pos, y_pos, speed_x, speed_y, mass, color, trail_list):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.speed_x = speed_x
         self.speed_y = speed_y
         self.mass = mass
         self.color = color
+        self.trail_list = trail_list
     
     # Updates the speed x and y variables to account for another mass
     def update_speed(self, other_x, other_y, other_mass):
@@ -90,6 +91,9 @@ class Body:
             radius = 1
 
         pygame.draw.circle(screen, self.color, (((self.x_pos-player_x)*(player_zoom/100))+window_size_x/2,((self.y_pos+player_y)*(player_zoom/100))+window_size_y/2), radius)
+    def draw_trail(self):
+        for i in range(len(self.trail_list)):
+            pass
 
 # The class Button which makes allows buttons to be made
 class Button():
@@ -110,9 +114,11 @@ class Button():
         else:
             screen.blit(self.image, (self.x, self.y))
 
-def typer(variable, input, type):
+def typer(variable, input, type, limit):
+    global frame
     if event.key == pygame.K_BACKSPACE:
         input = input[:-1]
+        frame = 60
     elif event.key == pygame.K_RETURN:
         if len(input) == 0:
             variable = 0
@@ -122,7 +128,9 @@ def typer(variable, input, type):
         type = False
     else:
         if event.unicode.isdigit():
-            input += event.unicode
+            if len(input) < limit:
+                input += event.unicode
+                frame = 60
 
     return variable, input, type
 
@@ -184,6 +192,8 @@ time_input = ""
 mass_type = False
 time_type = False
 
+frame = 0
+
 # Main Game Loop
 while True:
     # Delta time to maintain a fixed simulation speed
@@ -195,6 +205,14 @@ while True:
 
     # Empties deleted_bodies so then it can take new bodies
     deleted_bodies = []
+
+    # To get seconds for typing
+    if mass_type == True or time_type == True:
+        frame += 1
+        if frame > 120:
+            frame = 0
+    else:
+        frame = 60
 
     # Checks for user input
     for event in pygame.event.get():
@@ -252,7 +270,7 @@ while True:
                     
                 start_force_x, start_force_y = physics.find_distance_componets(past_mouse_x, past_mouse_y, mouse_x, mouse_y, select_mass, player_zoom)
                 
-                bodies.append(Body((((past_mouse_x-window_size_x/2)/(player_zoom/100))+player_x),(((past_mouse_y-window_size_y/2)/(player_zoom/100))-player_y),start_force_x,start_force_y,select_mass, random_color))
+                bodies.append(Body((((past_mouse_x-window_size_x/2)/(player_zoom/100))+player_x),(((past_mouse_y-window_size_y/2)/(player_zoom/100))-player_y),start_force_x,start_force_y,select_mass, random_color, []))
                 
                 random_color = (random.randint(15,255),random.randint(15,255),random.randint(15,255))
 
@@ -281,10 +299,10 @@ while True:
         # Allows the user to type in input for the time and mass variables
         if event.type == pygame.KEYDOWN:
             if mass_type == True:
-                select_mass, mass_input, mass_type = typer(select_mass, mass_input, mass_type)            
+                select_mass, mass_input, mass_type = typer(select_mass, mass_input, mass_type, 4)            
 
             if time_type == True:
-                time, time_input, time_type = typer(time, time_input, time_type)
+                time, time_input, time_type = typer(time, time_input, time_type, 3)
         
         # Changes zoom via mousewheel
         if event.type == pygame.MOUSEWHEEL:
@@ -305,7 +323,7 @@ while True:
 
                     rnd_mass = random.uniform(100,1000)
 
-                    bodies.append(Body(rnd_x,rnd_y,0,0,rnd_mass, rnd_clr))
+                    bodies.append(Body(rnd_x,rnd_y,0,0,rnd_mass, rnd_clr, []))
 
             # Clears out the entire play area
             if event.key == pygame.K_q:
@@ -362,7 +380,6 @@ while True:
     if click_s == True:
         player_y -= 10
 
-
     # Makes sure the select_mass variable never goes below 0 or above 200
     if select_mass < 1:
         select_mass = 1
@@ -407,11 +424,13 @@ while True:
         if body in bodies:
             bodies.remove(body)
     
-    # Updates the position of the bodies and draws them to the screen
+    # Updates the position of the bodies
     for body in bodies:
         for t in range(time):
             body.update_pos()
 
+    # Draws the bodies on the screen
+    for body in bodies:
         # Displays the body only if its within the screen limits
         if ((body.x_pos - player_x)-math.sqrt(body.mass))*(player_zoom/100) < window_size_x/2 and ((body.x_pos - player_x)+math.sqrt(body.mass))*(player_zoom/100) > -(window_size_x/2) and ((body.y_pos + player_y)-math.sqrt(body.mass))*(player_zoom/100) < window_size_y/2 and ((body.y_pos + player_y)+math.sqrt(body.mass))*(player_zoom/100) > -(window_size_y/2):
             body.display()
@@ -435,13 +454,19 @@ while True:
 
     # Creates the select_mass surface
     if mass_type == True:
-        mass_surface = text_font.render(f"Mass: {mass_input}", True, text_color)
+        if frame//60 == 1:
+            mass_surface = text_font.render(f"Mass: {mass_input}|", True, text_color)
+        else:
+            mass_surface = text_font.render(f"Mass: {mass_input}", True, text_color)
     else:
         mass_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
 
     # Creates the time surface
     if time_type == True:
-        time_surface = small_text_font.render(f"time: {time_input}", True, text_color)
+        if frame//60 == 1:
+            time_surface = small_text_font.render(f"time: {time_input}|", True, text_color)
+        else:
+            time_surface = small_text_font.render(f"time: {time_input}", True, text_color)
     else:
         time_surface = small_text_font.render(f"time: {time}", True, text_color)
 

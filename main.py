@@ -91,9 +91,12 @@ class Body:
             radius = 1
 
         pygame.draw.circle(screen, self.color, (((self.x_pos-player_x)*(player_zoom/100))+window_size_x/2,((self.y_pos+player_y)*(player_zoom/100))+window_size_y/2), radius)
+
     def draw_trail(self):
         for i in range(len(self.trail_list)):
-            pass
+            if i != len(self.trail_list)-1:
+                pygame.draw.line(screen, self.color, (((self.trail_list[i][0]-player_x)*(player_zoom/100))+window_size_x/2,((self.trail_list[i][1]+player_y)*(player_zoom/100))+window_size_y/2),(((self.trail_list[i+1][0]-player_x)*(player_zoom/100))+window_size_x/2,((self.trail_list[i+1][1]+player_y)*(player_zoom/100))+window_size_y/2), 1)
+                
 
 # The class Button which makes allows buttons to be made
 class Button():
@@ -162,6 +165,9 @@ mode_key = 1
 
 # Shows and hides excess menus 
 view_mode = 0
+
+# Shows and hides trails
+view_trails = 0
 
 # Player position
 player_x = 0
@@ -345,6 +351,12 @@ while True:
                 else:
                     view_mode = 0
 
+            if event.key == pygame.K_t:
+                if view_trails == 0:
+                    view_trails = 1
+                else:
+                    view_trails = 0
+
             # Updates the click values to tell if the user is holding down one of these buttons
             if event.key == pygame.K_d:
                 click_d = True
@@ -406,6 +418,12 @@ while True:
         for t in range(time):
             body.update_pos()
 
+        # Adds points to the trail_list of every body
+        body.trail_list.append((body.x_pos, body.y_pos))
+        if len(body.trail_list) > body.mass+1000:
+            body.trail_list.pop(0)
+        
+
     # Updates the speed of a given body by looping through every other body and checking attraction
     for body in bodies:
         for other_body in bodies:
@@ -423,11 +441,16 @@ while True:
 
                     # Updates the speed
                     body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
-    
+
     # Deletes any bodies in the deleted_bodies list
     for body in deleted_bodies:
         if body in bodies:
             bodies.remove(body)
+
+    # Draws trails
+    if view_trails == 1:
+        for body in bodies:
+            body.draw_trail()
 
     # Draws the bodies on the screen
     for body in bodies:

@@ -14,13 +14,11 @@ Right now its a good gravity sim. :3
 
 Controls:
 
-WASD - move
+WASD - Move
 
 Scroll - Changes zoom when mouse is over play area.
 
-Left Click - When clicking on the text for the Mass variable or the 
-             Time variable it now allows you to type in the desired
-             amounts.
+Click on the Mass and Time variables to change their amounts!!!!
 
 Button One (mouse icon) - When clicked on, it disables any extra 
                           controls. 
@@ -32,9 +30,11 @@ Button Two (plus icon) - When clicked on, it allows the user to
 Button Three (minus icon) - Allows the user to delete bodies by 
                             clicking on them.
 
-V - enables/disables gui
+V - Enables/disables gui
 
 P - Pauses and plays the simulation
+
+T - To enable trails
 
 Space - Adds a bunch of random bodies
 

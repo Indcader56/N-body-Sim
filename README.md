@@ -33,7 +33,7 @@ V - Enables/disables gui
 
 P - Pauses and plays the simulation
 
-T - To enable trails
+T - Enables/disables trails
 
 Space - Adds a bunch of random bodies
 

@@ -383,8 +383,8 @@ while True:
     # Makes sure the select_mass variable never goes below 0 or above 200
     if select_mass < 1:
         select_mass = 1
-    if select_mass > 5000:
-        select_mass = 5000
+    if select_mass > 9999:
+        select_mass = 9999
 
     # Makes sure the time variable never goes below 0 or above 100
     if time < 0:
@@ -400,6 +400,11 @@ while True:
 
     # Clears the screen
     screen.fill((0,0,0))
+
+    # Updates the position of the bodies
+    for body in bodies:
+        for t in range(time):
+            body.update_pos()
 
     # Updates the speed of a given body by looping through every other body and checking attraction
     for body in bodies:
@@ -423,11 +428,6 @@ while True:
     for body in deleted_bodies:
         if body in bodies:
             bodies.remove(body)
-    
-    # Updates the position of the bodies
-    for body in bodies:
-        for t in range(time):
-            body.update_pos()
 
     # Draws the bodies on the screen
     for body in bodies:
@@ -452,7 +452,7 @@ while True:
     if mode_key == 2 and hovering_list[-1] == True and view_mode == 0:
         pygame.draw.circle(screen, random_color, (mouse_x,mouse_y), math.sqrt(select_mass)*(player_zoom/100))
 
-    # Creates the select_mass surface
+    # Creates the select_mass surface and changes the message depending on if the user is typing
     if mass_type == True:
         if frame//60 == 1:
             mass_surface = text_font.render(f"Mass: {mass_input}|", True, text_color)
@@ -461,7 +461,7 @@ while True:
     else:
         mass_surface = text_font.render(f"Mass: {select_mass}", True, text_color)
 
-    # Creates the time surface
+    # Creates the time surface and changes the message depending on if the user is typing
     if time_type == True:
         if frame//60 == 1:
             time_surface = small_text_font.render(f"time: {time_input}|", True, text_color)

@@ -66,7 +66,7 @@ class Body:
         distance = math.sqrt(((other.x_pos-self.x_pos)**2) + ((other.y_pos-self.y_pos)**2))
 
         # Determines the winner of the collision
-        if other.mass > math.sqrt(self.mass):
+        if other.mass > self.mass:
             winner = other
             loser = self
         else:
@@ -413,6 +413,16 @@ while True:
     # Clears the screen
     screen.fill((0,0,0))
 
+    # Updates the position of the bodies
+    for body in bodies:
+        for t in range(time):
+            body.update_pos()
+
+        # Adds points to the trail_list of every body
+        body.trail_list.append((body.x_pos, body.y_pos))
+        if len(body.trail_list) > body.mass+1000:
+            body.trail_list.pop(0)
+
     # Updates the speed of a given body by looping through every other body and checking attraction
     for body in bodies:
         for other_body in bodies:
@@ -430,16 +440,6 @@ while True:
 
                     # Updates the speed
                     body.update_speed(other_body.x_pos,other_body.y_pos,other_body.mass)
-
-    # Updates the position of the bodies
-    for body in bodies:
-        for t in range(time):
-            body.update_pos()
-
-        # Adds points to the trail_list of every body
-        body.trail_list.append((body.x_pos, body.y_pos))
-        if len(body.trail_list) > body.mass+1000:
-            body.trail_list.pop(0)
 
     # Deletes any bodies in the deleted_bodies list
     for body in deleted_bodies:

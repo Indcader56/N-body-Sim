@@ -64,6 +64,7 @@ def find_distance_componets(past_x, past_y, current_x, current_y, s_mass, zoom):
     angle = math.atan2(y_side, x_side)
 
     # Finds the start force x and y and uses it to make the new object
-    start_force_x, start_force_y = final_x_y_componets(math.sqrt(distance), angle)
+    start_force_x, start_force_y = final_x_y_componets(distance/(zoom/7), angle)
 
+    print(start_force_x, start_force_y)
     return start_force_x, start_force_y

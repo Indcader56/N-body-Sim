@@ -418,10 +418,11 @@ while True:
         for t in range(time):
             body.update_pos()
 
-        # Adds points to the trail_list of every body
-        body.trail_list.append((body.x_pos, body.y_pos))
-        if len(body.trail_list) > body.mass+1000:
-            body.trail_list.pop(0)
+        if time > 0:
+            # Adds points to the trail_list of every body
+            body.trail_list.append((body.x_pos, body.y_pos))
+            if len(body.trail_list) > body.mass+1000:
+                body.trail_list.pop(0)
 
     # Updates the speed of a given body by looping through every other body and checking attraction
     for body in bodies:

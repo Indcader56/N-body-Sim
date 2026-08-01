@@ -39,6 +39,9 @@ alt_button_one = pygame.transform.scale(pygame.image.load("assents/Alt-Button_on
 alt_button_two = pygame.transform.scale(pygame.image.load("assents/Alt-Button_two.png"), (55,55))
 alt_button_three = pygame.transform.scale(pygame.image.load("assents/Alt-Button_three.png"), (55,55))
 
+# Night sky image
+sky = pygame.transform.scale(pygame.image.load("assents/sky.jpg"), (960,720))
+
 # Body class
 class Body:
     # Initalizes variables needed for a given body
@@ -412,6 +415,9 @@ while True:
 
     # Clears the screen
     screen.fill((0,0,0))
+
+    # Draws a night sky
+    #screen.blit(sky, (0,0))
 
     # Updates the position of the bodies
     for body in bodies:

@@ -12,7 +12,7 @@ Right now the game
  * Allows users to place and delete planetary bodies
  * Allows users to shoot the bodies by dragging
  * Allows the user to place bodies in orbits to let the user build systems
- * Calculates gravitation attraction and momentum from collisions
+ * Calculates gravitational attraction and momentum from collisions
  * Allows the player to manipulate the rate of time and the camera's position in the world
 
 

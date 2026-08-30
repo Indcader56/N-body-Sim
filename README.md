@@ -23,17 +23,23 @@ Button One (mouse icon) - When clicked on, it disables any extra
                           controls. 
                      
 Button Two (plus icon) - When clicked on, it allows the user to
-                         place bodies and by dragging shoot them
-                         in a certain direction.
+                         select certain sub buttons like orbit
+                         and shoot which allow the user to place
+                         bodies in orbit and shoot them respectively
                     
-Button Three (minus icon) - Allows the user to delete bodies by 
-                            clicking on them.
+Button Three (minus icon) - Opens up sub buttons which allow the user
+                            to either delete certain bodies or clear 
+                            out the entire area.
 
 V - Enables/disables gui
 
-P - Pauses and plays the simulation
+Q - Pauses and plays the simulation
 
 T - Enables/disables trails
+
+B - Enables the Background :D
+
+P - Deletes everything (alternative to the GUI button)
 
 Space - Adds a bunch of random bodies
 

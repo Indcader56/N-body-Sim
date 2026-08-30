@@ -1,5 +1,9 @@
 # N-body-Sim
-A N-body sim where users can place bodies and can make planetary systems
+A 2-D N-body simulation where users can create, destroy, and manipulate bodies in a infinite play area
+while also forming systems and messing around with momentum and orbital mechanics.
+
+Stardance Page: https://stardance.hackclub.com/projects/1846
+
 
 <img width="720" height="558" alt="Recording 2026-07-31 152529" src="https://github.com/user-attachments/assets/d894ca6e-fed4-4068-9b20-9bbbcc3fbeb2" />
 
@@ -7,9 +11,19 @@ A N-body sim where users can place bodies and can make planetary systems
 Right now the game
  * Allows users to place and delete planetary bodies
  * Allows users to shoot the bodies by dragging
+ * Allows the user to place bodies in orbits to let the user build systems
  * Calculates gravitation attraction and momentum from collisions
  * Allows the player to manipulate the rate of time and the camera's position in the world
 
+
+Future Plans:
+ * Will add realistic units (feet, seconds, etc)
+ * Full texture support
+ * Realistic Collisions that eject debris
+ * Optimized N-body code that can support thousands of bodies
+ * Will eventually remaster the gui to support modifying individual
+   characteristics of bodies (like density or mass)
+   
 
 Controls:
 

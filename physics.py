@@ -24,17 +24,29 @@ def final_x_y_componets(magnitude, angle):
 
     return magnitude_x, magnitude_y
 
-# Finds force componets for gravity
-def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass):
-    # Finds the distance between the other body and the current body
-    distance = find_distance(other_x, other_y, self_x, self_y)
-
-    # Finds the resulting force exerted on the current body using the Law of Gravitation (setting the gravitational constant to a basic 10)
+# Finds the resulting force exerted on the current body using the Law of Gravitation (setting the gravitational constant to a basic 10)
+def find_force_gravity(other_mass, self_mass, distance):
     g = 25
     try:
         force = g*((other_mass*self_mass)/(distance**2))
     except ZeroDivisionError:
         force = 0
+    return force
+
+def find_orbital_velocity(other_mass, self_mass, distance):
+    g = 25
+    try:
+        force = math.sqrt((g*(other_mass+self_mass))/distance)
+    except ZeroDivisionError:
+        force = 0
+    return force
+
+# Finds force componets for gravity
+def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass):
+    # Finds the distance between the other body and the current body
+    distance = find_distance(other_x, other_y, self_x, self_y)
+
+    force = find_force_gravity(other_mass, self_mass, distance)
 
     # Finds the difference in x and y to be used to find the angle of direction for the current body
     x_side = other_x - self_x
@@ -46,6 +58,25 @@ def find_force_componets(self_x, self_y, self_mass, other_x, other_y, other_mass
     force_x, force_y = final_x_y_componets(force, angle)
 
     return force_x, force_y
+
+def find_orbital_components(self_x, self_y, self_mass, other_x, other_y, other_mass):
+    # Finds the distance between the other body and the current body
+    distance = find_distance(other_x, other_y, self_x, self_y)
+
+    force = find_orbital_velocity(other_mass, self_mass, distance)
+
+
+    # Finds the difference in x and y to be used to find the angle of direction for the current body
+    x_side = other_x - self_x
+    y_side = other_y - self_y
+
+    angle = math.atan2(y_side, x_side) + (math.pi/2)
+
+    # Uses the force length and the angle to find the componets of the force (fx,fy)
+    force_x, force_y = final_x_y_componets(force, angle)
+
+    return force_x, force_y
+    
 
 # Finds the distance between two points: used for finding the starting speed of a body when placed
 def find_distance_componets(past_x, past_y, current_x, current_y, s_mass, zoom):

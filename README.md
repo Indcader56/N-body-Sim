@@ -42,8 +42,6 @@ B - Enables the Background :D
 P - Deletes everything (alternative to the GUI button)
 
 Space - Adds a bunch of random bodies
-
-Q - Deletes all bodies
          
 If you wanna see a video of it working:
 https://www.youtube.com/watch?v=UsZ2oN7yn8g
